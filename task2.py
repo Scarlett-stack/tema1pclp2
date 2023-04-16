@@ -8,27 +8,36 @@ class Image():
     def __str__(self):
         # use this for debugging
         image = ""
-        image += f"{self.format}{self.rows} {self.columns}\n{self.max_value}\n"
+        image += f"{self.format}\n{self.rows} {self.columns}\n{self.max_value}\n"
         for i in range(self.rows):
             for j in range(3 * self.columns):
                 image += f"{self.pixels[i][j]} "
             image += "\n"
+        #print(image)
         return image
     def sepia(self):
         # apply sepia filter to the image
         x = self.columns * 3
         j = 0
         for i in range(self.rows):
-            while j < x-3:
+            j = 0
+            while j < x:
                 sepia_r = (int)(0.393*self.pixels[i][j] + 0.769*self.pixels[i][j+1] + 0.189*self.pixels[i][j+2])
                 sepia_g = (int)(0.349*self.pixels[i][j] + 0.686*self.pixels[i][j+1] + 0.168*self.pixels[i][j+2])
                 sepia_b = (int)(0.272*self.pixels[i][j] + 0.534*self.pixels[i][j+1] + 0.131*self.pixels[i][j+2])
-                self.pixels[i][j] = sepia_r % 255
-                self.pixels[i][j+1] = sepia_g % 255
-                self.pixels[i][j+2] = sepia_b %255
+                if sepia_r > 255: #dupa lungi si ingrozitoare lupte seculare --tot nu sunt de acord cu chestia asta scz
+                    sepia_r = 255
+                if sepia_g > 255:
+                    sepia_g = 255
+                if sepia_b > 255:
+                    sepia_b = 255
+                self.pixels[i][j] = sepia_r 
+                self.pixels[i][j+1] = sepia_g 
+                self.pixels[i][j+2] = sepia_b 
                 j = j+3
 
     def read(self, filename):
+        # read from file and assign the correct parameters (see README and input examples)
         f = open(filename,"r")
         self.format = f.readline().strip() #scot endl e strcspn din c
         size = f.readline().split()
@@ -48,10 +57,8 @@ class Image():
                 self.pixels[i][j] =int(linie[j])
                 j = j + 1
         f.close()
-        # read from file and assign the correct parameters (see README and input examples)
     def write(self, filename):
         # write to file in the correct format (see README and input examples)
-        #print(self.pixels.__str__())
         f = open(filename,"w")
         f.write(f"{self.format}\n{self.rows} {self.columns}\n{self.max_value}\n")
         x = self.columns *3
@@ -63,20 +70,3 @@ class Image():
                     f.write(" ")
             f.write("\n")
         f.close()
-
-'''
-image = Image(format='P3', rows=3, columns=3, max_value=255, pixels=[
-    [255, 0, 0, 0, 255, 0, 0, 0, 255],
-    [255, 255, 0, 255, 255, 255, 0, 0, 0],
-    [0, 255, 255, 75, 75, 75, 127, 127, 127]
-])
-
-# Read an image from a file
-image.read("in.ppm")
-
-# Apply the sepia filter
-#image.sepia()
-
-# Write the modified image to a new file
-image.write('output.ppm')
-'''
